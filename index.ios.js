@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import {
   AppRegistry,
+  Dimensions,
   Image,
   ListView,
   StyleSheet,
@@ -151,6 +152,9 @@ class ListHomeScreen extends React.Component {
   }
 }
 
+const { width, height } = Dimensions.get('window');
+const gutter = 15;
+
 class CollectionItemsScreen extends React.Component {
 
   constructor(props) {
@@ -167,8 +171,18 @@ class CollectionItemsScreen extends React.Component {
 
   static navigationOptions = {
     title: 'Napa Valley Wineries',
-    headerRight: <View><Text>Grid</Text></View>,
+    headerRight: <Button 
+                  title='Grid'
+                  
+                 />,
   };
+
+  changeView() {
+    // var style = this.state.displayStyle == 'list' ? 'grid' : 'list'
+    this.setState({
+      displayStyle: this.state.displayStyle == 'list' ? 'grid' : 'list'
+    })
+  }
 
   componentDidMount() {
     // this.fetchData();
@@ -176,7 +190,9 @@ class CollectionItemsScreen extends React.Component {
       // items: MOCKED_ITEMS_DATA
       dataSource: this.state.dataSource.cloneWithRows(MOCKED_ITEMS_DATA),
       loaded: true,
+      displayStyle: 'list',
     });
+    // this.props.navigation.setParams({ handleView: this.changeView });
   }
 
   fetchData() {
@@ -195,14 +211,47 @@ class CollectionItemsScreen extends React.Component {
   render() {
     const { navigate } = this.props.navigation;
 
+    if(this.state.displayStyle == 'list') {
+      return (
+        <View style={styles.container}>
+          <Button title='Grid' onPress={() => { this.changeView() }}/>
+          <ListView
+            dataSource={this.state.dataSource}
+            renderRow={this.renderList.bind(this)}
+            style={styles.listView}
+          />
+        </View>
+      );
+      
+    } else {
+      return (
+        <View>
+          <Button title='List' onPress={() => { this.changeView() }}/>
+          <ListView contentContainerStyle={styles.gridRow}
+            dataSource={this.state.dataSource}
+            renderRow={this.renderGrid.bind(this)}
+            style={styles.listView}
+          />
+        </View>
+        
+      );  
+    }
+    
+  }
+
+  renderGrid(movie) {
+    const { navigate } = this.props.navigation;
     return (
-      <View style={styles.container}>
-        <ListView
-          dataSource={this.state.dataSource}
-          renderRow={this.renderList.bind(this)}
-          style={styles.listView}
-        />
-      </View>
+      <TouchableHighlight 
+        onPress={() => navigate('Chat',{movie})}>
+        <View style={styles.gridItem}>
+            <Image
+              source={{uri: movie.posters.thumbnail}}
+              style={styles.gridThumbnail}
+            />
+            <Text style={styles.gridTitle}>{movie.title}</Text>
+        </View>
+      </TouchableHighlight>
     );
   }
 
@@ -214,10 +263,10 @@ class CollectionItemsScreen extends React.Component {
         <View style={styles.container}>
           <Image
             source={{uri: movie.posters.thumbnail}}
-            style={styles.thumbnail}
+            style={styles.listThumbnail}
           />
           <View style={styles.rightContainer}>
-            <Text style={styles.title}>{movie.title}</Text>
+            <Text style={styles.listTitle}>{movie.title}</Text>
             <Text style={styles.year}>💬 {movie.thought}</Text>
             <Text style={styles.year}>{movie.saves} Saves</Text>
           </View>
@@ -247,24 +296,45 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FFF',
-    // fontFamily: 'PingFang TC'
   },
   rightContainer: {
     flex: 1,
     marginBottom: 10,
   },
+  gridRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    paddingHorizontal: gutter,
+  },
+  gridItem: {
+    width: (width - gutter * 3)/3,
+    marginBottom: gutter,
+    flexDirection: 'column',
+    alignSelf: 'flex-start',
+  },
+  gridTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  gridThumbnail: {
+    width: 102,
+    height: 102,
+    borderRadius: 5,
+  },
   listView: {
     paddingTop: 20,
     backgroundColor: '#F5FCFF',
   },
-  thumbnail: {
+  listThumbnail: {
     width: 52,
     height: 52,
     marginRight: 12,
     marginLeft: 20,
     borderRadius: 5,
   },
-  title: {
+  listTitle: {
     fontSize: 14,
     fontWeight: '700',
     textAlign: 'left',

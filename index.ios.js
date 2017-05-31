@@ -47,13 +47,13 @@ var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/maste
 
 class ChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
-    title: `Chat with ${navigation.state.params.user}`,
+    title: `Chat with ${navigation.state.params.movie.title}`,
   });
   render() {
     const { params } = this.props.navigation.state;
     return (
       <View>
-        <Text>Chat with {params.user}</Text>
+        <Text>Chat with {params.movie.title}</Text>
       </View>
     );
   }
@@ -134,7 +134,7 @@ class ListHomeScreen extends React.Component {
     const { navigate } = this.props.navigation;
     return (
       <TouchableHighlight 
-        onPress={() => navigate('Chat',{user: '{movie.title}'})}>
+        onPress={() => navigate('Chat',{movie})}>
         <View style={styles.container}>
           <Image
             source={{uri: movie.posters.thumbnail}}

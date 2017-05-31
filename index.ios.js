@@ -180,11 +180,15 @@ class CollectionItemsScreen extends React.Component {
   changeView() {
     // var style = this.state.displayStyle == 'list' ? 'grid' : 'list'
     this.setState({
-      displayStyle: this.state.displayStyle == 'list' ? 'grid' : 'list'
+      displayStyle: this.state.displayStyle == 'list' ? 'grid' : 'list',
+      dataSource: new ListView.DataSource({
+        rowHasChanged: (row1, row2) => row1 !== row2,
+      }),
     })
   }
 
-  componentDidMount() {
+
+  componentWillMount() {
     // this.fetchData();
     this.setState({
       // items: MOCKED_ITEMS_DATA
@@ -216,19 +220,20 @@ class CollectionItemsScreen extends React.Component {
         <View style={styles.container}>
           <Button title='Grid' onPress={() => { this.changeView() }}/>
           <ListView
-            dataSource={this.state.dataSource}
+            dataSource={this.state.dataSource.cloneWithRows(MOCKED_ITEMS_DATA)}
             renderRow={this.renderList.bind(this)}
             style={styles.listView}
           />
         </View>
       );
       
-    } else {
+    } 
+    else {
       return (
         <View>
           <Button title='List' onPress={() => { this.changeView() }}/>
           <ListView contentContainerStyle={styles.gridRow}
-            dataSource={this.state.dataSource}
+            dataSource={this.state.dataSource.cloneWithRows(MOCKED_ITEMS_DATA)}
             renderRow={this.renderGrid.bind(this)}
             style={styles.listView}
           />

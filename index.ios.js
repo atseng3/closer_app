@@ -42,6 +42,12 @@ var MOCKED_ITEMS_DATA = [
   {title: 'Frogs Leap', saves: '233', thought: 'Drink easily at a pretty garden', posters: {thumbnail: 'https://facebook.github.io/react/img/logo_og.png'}},
 ];
 
+var MOCKED_COLLECTIONS_DATA = [
+  {title: 'Napa Valley Wineries', followers: '2.5M', posters: {thumbnail: 'https://facebook.github.io/react/img/logo_og.png'}},
+  {title: 'Horror Movies', followers: '45k', posters: {thumbnail: 'https://facebook.github.io/react/img/logo_og.png'}},
+  {title: 'SF Restaurants', followers: '3k', posters: {thumbnail: 'https://facebook.github.io/react/img/logo_og.png'}},
+];
+
 var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
 
 
@@ -84,7 +90,84 @@ class ListHomeScreen extends React.Component {
   }
 
   static navigationOptions = {
-    title: 'Welcome',
+    title: 'atseng3',
+  };
+
+  componentDidMount() {
+    // this.fetchData();
+    this.setState({
+      // items: MOCKED_ITEMS_DATA
+      dataSource: this.state.dataSource.cloneWithRows(MOCKED_COLLECTIONS_DATA),
+      loaded: true,
+    });
+  }
+
+  fetchData() {
+    fetch(REQUEST_URL)
+      .then((response) => response.json())
+      .then((responseData) => {
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(responseData.movies),
+          loaded: true,
+        });
+      })
+      .done();
+  }
+
+
+  render() {
+    const { navigate } = this.props.navigation;
+
+    return (
+      <View style={styles.container}>
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={this.renderList.bind(this)}
+          style={styles.listView}
+        />
+      </View>
+    );
+  }
+
+  renderList(movie) {
+    const { navigate } = this.props.navigation;
+    return (
+      <TouchableHighlight 
+        onPress={() => navigate('CollectionItems',{movie})}>
+        <View style={styles.container}>
+          <View style={styles.rightContainer}>
+            <Image
+              source={{uri: movie.posters.thumbnail}}
+              style={styles.collectionBG}
+            />
+            <View style={styles.collectionText}>
+              <Text style={styles.collectionTitle}>{movie.title}</Text>
+              <Text style={styles.collectionSubtitle}>{movie.followers} followers</Text>
+            </View>
+          </View>
+        </View>
+      </TouchableHighlight>
+    );
+  }
+}
+
+class CollectionItemsScreen extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedTab: 'tabOne',
+      dataSource: new ListView.DataSource({
+        rowHasChanged: (row1, row2) => row1 !== row2,
+      }),
+      // items: null,
+      loaded: false,
+    };
+  }
+
+  static navigationOptions = {
+    title: 'Napa Valley Wineries',
+    headerRight: <View><Text>Grid</Text></View>,
   };
 
   componentDidMount() {
@@ -116,21 +199,14 @@ class ListHomeScreen extends React.Component {
       <View style={styles.container}>
         <ListView
           dataSource={this.state.dataSource}
-          renderRow={this.renderMovie.bind(this)}
+          renderRow={this.renderList.bind(this)}
           style={styles.listView}
         />
       </View>
-      // <View>
-      //   <Text>Hello, Chat App!</Text>
-      //   <Button
-      //     onPress={() => navigate('Chat',{user: 'Lucy'})}
-      //     title="Chat with Lucy"
-      //   />
-      // </View>
     );
   }
 
-  renderMovie(movie) {
+  renderList(movie) {
     const { navigate } = this.props.navigation;
     return (
       <TouchableHighlight 
@@ -155,6 +231,7 @@ class ListHomeScreen extends React.Component {
 
 const ListNav = StackNavigator({
   Home: { screen: ListHomeScreen },
+  CollectionItems: { screen: CollectionItemsScreen },
   Chat: { screen: ChatScreen },
 });
 
@@ -162,123 +239,6 @@ const MainScreenNavigator = TabNavigator({
   Recent: { screen: ListNav },
   All: { screen: ExploreScreen },
 });
-
-
-
-
-
-
-export default class AwesomeProject extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedTab: 'tabOne',
-      dataSource: new ListView.DataSource({
-        rowHasChanged: (row1, row2) => row1 !== row2,
-      }),
-      // items: null,
-      loaded: false,
-    };
-  }
-
-  setTab(tabId) {
-    this.setState({selectedTab: tabId})
-  }
-
-  componentDidMount() {
-    // this.fetchData();
-    this.setState({
-      // items: MOCKED_ITEMS_DATA
-      dataSource: this.state.dataSource.cloneWithRows(MOCKED_ITEMS_DATA),
-      loaded: true,
-    });
-  }
-
-  fetchData() {
-    fetch(REQUEST_URL)
-      .then((response) => response.json())
-      .then((responseData) => {
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(responseData.movies),
-          loaded: true,
-        });
-      })
-      .done();
-  }
-
-  render() {
-    if (!this.state.loaded) {
-      return this.renderLoadingView();
-    }
-
-    // return (
-    //   <ListView
-    //     dataSource={this.state.dataSource}
-    //     renderRow={this.renderMovie}
-    //     style={styles.listView}
-    //   />
-    // );
-    return (
-      <TabBarIOS>
-        <TabBarIOS.Item 
-        systemIcon="history"
-        selected={this.state.selectedTab === 'tabOne'}
-        onPress={() => this.setTab('tabOne')}>
-          <View style={styles.container}>
-            <Text style={styles.tabText}>Tab One</Text>
-          </View>
-        </TabBarIOS.Item>
-        <TabBarIOS.Item 
-        systemIcon="favorites"
-        selected={this.state.selectedTab === 'tabTwo'}
-        onPress={() => this.setTab('tabTwo')}>
-          <View style={styles.container}>
-            <ListView
-              dataSource={this.state.dataSource}
-              renderRow={this.renderMovie}
-              style={styles.listView}
-            />
-          </View>
-        </TabBarIOS.Item>
-        <TabBarIOS.Item 
-        systemIcon="more"
-        selected={this.state.selectedTab === 'tabThree'}
-        onPress={() => this.setTab('tabThree')}>
-          <View style={styles.container}>
-            <Text style={styles.tabText}>Tab Three</Text>
-          </View>
-        </TabBarIOS.Item>
-      </TabBarIOS>
-    );
-  }
-
-
-  renderLoadingView() {
-    return (
-      <View style={styles.container}>
-        <Text>
-          Loading movies...
-        </Text>
-      </View>
-    );
-  }
-
-  renderMovie(movie) {
-    return (
-      <View style={styles.container}>
-        <Image
-          source={{uri: movie.posters.thumbnail}}
-          style={styles.thumbnail}
-        />
-        <View style={styles.rightContainer}>
-          <Text style={styles.title}>{movie.title}</Text>
-          <Text style={styles.year}>💬 {movie.thought}</Text>
-          <Text style={styles.year}>{movie.saves} Saves</Text>
-        </View>
-      </View>
-    );
-  }
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -307,7 +267,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '700',
-
     textAlign: 'left',
   },
   year: {
@@ -317,7 +276,35 @@ const styles = StyleSheet.create({
   tabText: {
     margin: 50,
     fontSize: 45
-  }
+  },
+  collectionBG: {
+    width: 325,
+    height: 94,
+    marginRight: 25,
+    marginLeft: 25,
+
+  },
+  collectionText: {
+    width: 325,
+    height: 94,
+    backgroundColor: 'transparent',
+    marginTop: -94,
+    marginLeft: 30,
+    paddingTop: 40,
+
+  },
+  collectionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: 'white',
+    textAlign: 'left',
+  },
+  collectionSubtitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'white',
+    textAlign: 'left',
+  },
 });
 
 AppRegistry.registerComponent('AwesomeProject', () => MainScreenNavigator);

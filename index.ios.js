@@ -16,6 +16,7 @@ import {
   Text,
   View,
   Button,
+  TouchableHighlight,
 } from 'react-native';
 
 
@@ -115,12 +116,8 @@ class ListHomeScreen extends React.Component {
       <View style={styles.container}>
         <ListView
           dataSource={this.state.dataSource}
-          renderRow={this.renderMovie}
+          renderRow={this.renderMovie.bind(this)}
           style={styles.listView}
-        />
-        <Button
-            onPress={() => navigate('Chat',{user: 'Lucy'})}
-            title="See more"
         />
       </View>
       // <View>
@@ -134,18 +131,22 @@ class ListHomeScreen extends React.Component {
   }
 
   renderMovie(movie) {
+    const { navigate } = this.props.navigation;
     return (
-      <View style={styles.container}>
-        <Image
-          source={{uri: movie.posters.thumbnail}}
-          style={styles.thumbnail}
-        />
-        <View style={styles.rightContainer}>
-          <Text style={styles.title}>{movie.title}</Text>
-          <Text style={styles.year}>💬 {movie.thought}</Text>
-          <Text style={styles.year}>{movie.saves} Saves</Text>
+      <TouchableHighlight 
+        onPress={() => navigate('Chat',{user: '{movie.title}'})}>
+        <View style={styles.container}>
+          <Image
+            source={{uri: movie.posters.thumbnail}}
+            style={styles.thumbnail}
+          />
+          <View style={styles.rightContainer}>
+            <Text style={styles.title}>{movie.title}</Text>
+            <Text style={styles.year}>💬 {movie.thought}</Text>
+            <Text style={styles.year}>{movie.saves} Saves</Text>
+          </View>
         </View>
-      </View>
+      </TouchableHighlight>
     );
   }
 }

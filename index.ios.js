@@ -15,7 +15,12 @@ import {
   TabBarIOS,
   Text,
   View,
+  Button,
 } from 'react-native';
+
+
+import { StackNavigator,TabNavigator } from 'react-navigation';
+
 
 var MOCKED_MOVIES_DATA = [
   {title: 'Title', year: '2015', posters: {thumbnail: 'https://facebook.github.io/react/img/logo_og.png'}},
@@ -37,6 +42,130 @@ var MOCKED_ITEMS_DATA = [
 ];
 
 var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
+
+
+class ChatScreen extends React.Component {
+  static navigationOptions = ({ navigation }) => ({
+    title: `Chat with ${navigation.state.params.user}`,
+  });
+  render() {
+    const { params } = this.props.navigation.state;
+    return (
+      <View>
+        <Text>Chat with {params.user}</Text>
+      </View>
+    );
+  }
+}
+
+class ExploreScreen extends React.Component {
+  render() {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.tabText}>Explore!</Text>
+      </View>
+    );
+  }
+}
+
+class ListHomeScreen extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedTab: 'tabOne',
+      dataSource: new ListView.DataSource({
+        rowHasChanged: (row1, row2) => row1 !== row2,
+      }),
+      // items: null,
+      loaded: false,
+    };
+  }
+
+  static navigationOptions = {
+    title: 'Welcome',
+  };
+
+  componentDidMount() {
+    // this.fetchData();
+    this.setState({
+      // items: MOCKED_ITEMS_DATA
+      dataSource: this.state.dataSource.cloneWithRows(MOCKED_ITEMS_DATA),
+      loaded: true,
+    });
+  }
+
+  fetchData() {
+    fetch(REQUEST_URL)
+      .then((response) => response.json())
+      .then((responseData) => {
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(responseData.movies),
+          loaded: true,
+        });
+      })
+      .done();
+  }
+
+
+  render() {
+    const { navigate } = this.props.navigation;
+
+    return (
+      <View style={styles.container}>
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={this.renderMovie}
+          style={styles.listView}
+        />
+        <Button
+            onPress={() => navigate('Chat',{user: 'Lucy'})}
+            title="See more"
+        />
+      </View>
+      // <View>
+      //   <Text>Hello, Chat App!</Text>
+      //   <Button
+      //     onPress={() => navigate('Chat',{user: 'Lucy'})}
+      //     title="Chat with Lucy"
+      //   />
+      // </View>
+    );
+  }
+
+  renderMovie(movie) {
+    return (
+      <View style={styles.container}>
+        <Image
+          source={{uri: movie.posters.thumbnail}}
+          style={styles.thumbnail}
+        />
+        <View style={styles.rightContainer}>
+          <Text style={styles.title}>{movie.title}</Text>
+          <Text style={styles.year}>💬 {movie.thought}</Text>
+          <Text style={styles.year}>{movie.saves} Saves</Text>
+        </View>
+      </View>
+    );
+  }
+}
+
+
+
+const ListNav = StackNavigator({
+  Home: { screen: ListHomeScreen },
+  Chat: { screen: ChatScreen },
+});
+
+const MainScreenNavigator = TabNavigator({
+  Recent: { screen: ListNav },
+  All: { screen: ExploreScreen },
+});
+
+
+
+
+
 
 export default class AwesomeProject extends Component {
   constructor(props) {
@@ -190,4 +319,7 @@ const styles = StyleSheet.create({
   }
 });
 
-AppRegistry.registerComponent('AwesomeProject', () => AwesomeProject);
+AppRegistry.registerComponent('AwesomeProject', () => MainScreenNavigator);
+
+
+

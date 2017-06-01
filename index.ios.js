@@ -161,6 +161,7 @@ class CollectionItemsScreen extends React.Component {
     super(props);
     this.state = {
       selectedTab: 'tabOne',
+      displayStyle: 'list',
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
@@ -169,22 +170,28 @@ class CollectionItemsScreen extends React.Component {
     };
   }
 
-  static navigationOptions = {
-    title: 'Napa Valley Wineries',
-    headerRight: <Button 
-                  title='Grid'
-                  
-                 />,
-  };
+  static navigationOptions = ({ navigation, screenProps }) => ({
+    title: navigation.state.params.movie.title,
+    headerRight: <Button title= {(navigation.state.params.style == 'list') ? 'List' : 'Grid'} onPress={() => {navigation.state.params.handleSave()}} />
+  });
+
+
+  componentDidMount() {
+    this.props.navigation.setParams({ handleSave: this.changeView.bind(this) });
+  }
+
 
   changeView() {
-    // var style = this.state.displayStyle == 'list' ? 'grid' : 'list'
+    
+    // alert('ChangeView');
     this.setState({
       displayStyle: this.state.displayStyle == 'list' ? 'grid' : 'list',
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
     })
+    this.props.navigation.setParams({ style: this.state.displayStyle });
+
   }
 
 
@@ -218,7 +225,6 @@ class CollectionItemsScreen extends React.Component {
     if(this.state.displayStyle == 'list') {
       return (
         <View style={styles.container}>
-          <Button title='Grid' onPress={() => { this.changeView() }}/>
           <ListView
             dataSource={this.state.dataSource.cloneWithRows(MOCKED_ITEMS_DATA)}
             renderRow={this.renderList.bind(this)}
@@ -231,7 +237,6 @@ class CollectionItemsScreen extends React.Component {
     else {
       return (
         <View>
-          <Button title='List' onPress={() => { this.changeView() }}/>
           <ListView contentContainerStyle={styles.gridRow}
             dataSource={this.state.dataSource.cloneWithRows(MOCKED_ITEMS_DATA)}
             renderRow={this.renderGrid.bind(this)}

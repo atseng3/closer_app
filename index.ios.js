@@ -44,12 +44,44 @@ var MOCKED_ITEMS_DATA = [
 ];
 
 var MOCKED_COLLECTIONS_DATA = [
-  {title: 'Napa Valley Wineries', followers: '2.5M', posters: {thumbnail: 'https://facebook.github.io/react/img/logo_og.png'}},
-  {title: 'Horror Movies', followers: '45k', posters: {thumbnail: 'https://facebook.github.io/react/img/logo_og.png'}},
+  {title: 'Napa Valley Wineries', followers: '2.5M', posters: {thumbnail: "https://res.cloudinary.com/daehjdxjm/image/upload/w_325,c_scale/v1491791222/jitu51xqwz6tqw4tf0hb.jpg"}},
+  {title: 'Best Ski Places', followers: '45k', posters: {thumbnail: 'https://scontent-tpe1-1.xx.fbcdn.net/v/t1.0-9/16998250_10211407391916003_4995942992871195066_n.jpg?oh=3e076e55d2bc83fccc9520df73980017&oe=59A7F47F'}},
   {title: 'SF Restaurants', followers: '3k', posters: {thumbnail: 'https://facebook.github.io/react/img/logo_og.png'}},
 ];
 
 var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
+
+class ProfileHeader extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: 'tedtien',
+      collections: 3,
+      items: 99,
+    };
+  }
+
+  render() {
+    return (
+      <View style={styles.profileHeader} >
+        <View style={{flex: 1,flexDirection: 'row',justifyContent: 'space-between', alignItems: 'flex-end'}} >
+          <View style={styles.profileHeaderComponent}>
+            <View style={styles.profilePicture}></View>
+            <Text style={{fontWeight: 'bold',fontSize: 14, color: 'black',marginTop: 10}}>{this.state.username}</Text>  
+          </View>
+          <View style={styles.profileHeaderComponent}>
+            <Text style={{fontWeight: 'bold',fontSize: 20, color: 'black'}}>{this.state.collections}</Text>
+            <Text style={{color: 'black',marginTop: 5}}>Collections</Text>
+          </View>
+          <View style={styles.profileHeaderComponent}>
+            <Text style={{fontWeight: 'bold',fontSize: 20, color: 'black'}}>{this.state.items}</Text>
+            <Text style={{color: 'black',marginTop: 5}}>Saved Items</Text>
+          </View>
+        </View> 
+      </View>
+    );
+  }
+}
 
 
 class ChatScreen extends React.Component {
@@ -91,7 +123,7 @@ class ListHomeScreen extends React.Component {
   }
 
   static navigationOptions = {
-    title: 'atseng3',
+    title: 'My Collections',
   };
 
   componentDidMount() {
@@ -120,13 +152,17 @@ class ListHomeScreen extends React.Component {
     const { navigate } = this.props.navigation;
 
     return (
-      <View style={styles.container}>
-        <ListView
-          dataSource={this.state.dataSource}
-          renderRow={this.renderList.bind(this)}
-          style={styles.listView}
-        />
+      <View style={styles.body}>
+        <ProfileHeader/>
+        <View>
+          <ListView
+            dataSource={this.state.dataSource}
+            renderRow={this.renderList.bind(this)}
+            style={styles.listView}
+          />
+        </View>
       </View>
+      
     );
   }
 
@@ -141,6 +177,7 @@ class ListHomeScreen extends React.Component {
               source={{uri: movie.posters.thumbnail}}
               style={styles.collectionBG}
             />
+            <View style={styles.imageShadow}></View>
             <View style={styles.collectionText}>
               <Text style={styles.collectionTitle}>{movie.title}</Text>
               <Text style={styles.collectionSubtitle}>{movie.followers} followers</Text>
@@ -300,16 +337,23 @@ const MainScreenNavigator = TabNavigator({
 });
 
 const styles = StyleSheet.create({
+  baseText: {
+    fontFamily: 'Helvetica'
+  },
+  body: {
+    height: height,
+  },
   container: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    // backgroundColor: '#FFF',
   },
   rightContainer: {
     flex: 1,
     marginBottom: 10,
+    borderRadius: 5
   },
   gridRow: {
     flexDirection: 'row',
@@ -362,29 +406,63 @@ const styles = StyleSheet.create({
     height: 94,
     marginRight: 25,
     marginLeft: 25,
-
+    borderRadius: 5,
+  },
+  imageShadow: {
+    backgroundColor: 'rgba(74,74,74,0.2)',
+    width: 325,
+    height: 94,
+    marginTop: -94,
+    marginRight: 25,
+    marginLeft: 25,
+    borderRadius: 5
   },
   collectionText: {
     width: 325,
     height: 94,
     backgroundColor: 'transparent',
     marginTop: -94,
-    marginLeft: 30,
+    marginLeft: 40,
     paddingTop: 40,
 
   },
   collectionTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
     color: 'white',
     textAlign: 'left',
   },
   collectionSubtitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '500',
     color: 'white',
     textAlign: 'left',
   },
+  profileHeader: {
+    height: 180,
+    backgroundColor: '#FFF',
+    borderBottomColor: '#7A47C2',
+    borderBottomWidth: 2,
+    // border: 9,
+    paddingRight: 25,
+    paddingLeft: 25
+  },
+  profileHeaderComponent: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profileHeaderText: {
+    color: 'black',
+  },
+  profilePicture: {
+    backgroundColor: 'rgba(74,74,74,0.5)',
+    height: 80,
+    width: 80,
+    borderColor: '#7A47C2',
+    borderRadius: 150,
+    borderStyle: 'solid',
+    borderWidth: 2
+  }
 });
 
 AppRegistry.registerComponent('AwesomeProject', () => MainScreenNavigator);

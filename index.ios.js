@@ -49,6 +49,10 @@ var MOCKED_COLLECTIONS_DATA = [
   {title: 'SF Restaurants', followers: '3k', posters: {thumbnail: 'https://facebook.github.io/react/img/logo_og.png'}},
 ];
 
+var MOCKED_ITEM_DETAILS = [
+  {name: 'Long Island Ice Tea', collection: 'Alcohol', saved: '999', store: 'B Line by A Train', thought: 'Best drink place ever!', picture: 'https://res.cloudinary.com/daehjdxjm/image/upload/v1491012912/tppmnkxdpvldvux8tcpa.jpg'}
+];
+
 var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
 
 class ProfileHeader extends React.Component {
@@ -85,14 +89,33 @@ class ProfileHeader extends React.Component {
 
 
 class ChatScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedTab: 'tabOne',
+      dataSource: {name: 'Long Island Ice Tea', collection: 'Alcohol', saved: '999', store: 'B Line by A Train', thought: 'Best drink place ever!', picture: 'https://res.cloudinary.com/daehjdxjm/image/upload/v1491012912/tppmnkxdpvldvux8tcpa.jpg'},
+      // items: null,
+      loaded: true,
+    };
+  }
   static navigationOptions = ({ navigation }) => ({
-    title: `Chat with ${navigation.state.params.movie.title}`,
+    title: "tedtien's Item",
   });
+
+
   render() {
     const { params } = this.props.navigation.state;
     return (
-      <View>
-        <Text>Chat with {params.movie.title}</Text>
+      <View style={styles.itemDetail}>
+        <Text>📔 {this.state.dataSource.collection}</Text>
+        <Image
+          source={{uri: this.state.dataSource.picture}}
+          style={styles.itemPicture}
+        />
+        <Text>{this.state.dataSource.name}</Text>
+        <Text>{this.state.dataSource.saved} others Saved</Text>
+        <Text>{this.state.dataSource.thought}</Text>
+        <Text>{this.state.dataSource.store}</Text>
       </View>
     );
   }
@@ -348,7 +371,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // backgroundColor: '#FFF',
+    backgroundColor: '#FFF',
   },
   rightContainer: {
     flex: 1,
@@ -443,7 +466,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderBottomColor: '#7A47C2',
     borderBottomWidth: 2,
-    // border: 9,
     paddingRight: 25,
     paddingLeft: 25
   },
@@ -462,7 +484,20 @@ const styles = StyleSheet.create({
     borderRadius: 150,
     borderStyle: 'solid',
     borderWidth: 2
-  }
+  },
+  itemDetail: {
+    height: height,
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+
+  },
+  itemPicture: {
+    width: 275,
+    height: 275,
+    // marginRight: 25,
+    // marginLeft: 25,
+    borderRadius: 5,
+  },
 });
 
 AppRegistry.registerComponent('AwesomeProject', () => MainScreenNavigator);
